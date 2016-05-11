@@ -96,6 +96,10 @@ float floatIEEE::getDecimal(){
     return value;
 }
 
+std::vector<int> floatIEEE::getMantisa(){
+    return mantisa;
+}
+
 int floatIEEE::exponenteADecimal(){
     int result = 0;
     for(int i = 0; i < exponente.size(); i++){

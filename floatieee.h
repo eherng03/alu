@@ -15,7 +15,8 @@ public:
     std::vector<int> getFloatingPoint( float value, std::string* cadena);
     float getDecimal();
     std::string aCadena();
-    int exponenteADecimal(){
+    int exponenteADecimal();
+    std::vector<int> getMantisa();
 private:
     int signo;
     float numero;

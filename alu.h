@@ -11,6 +11,7 @@ public:
     alu();
     std::vector<int> obtenerSignificativo(int exponente, floatIEEE *operando);
     //le pasamos el resultado como puntero para guardarlo directamente
+    int verExponente(floatIEEE *operando1, floatIEEE *operando2);
     floatIEEE producto(floatIEEE* operando1, floatIEEE* operando2);
     floatIEEE suma(floatIEEE* operando1, floatIEEE* operando2);
     floatIEEE division(floatIEEE *operando1, floatIEEE *operando2);

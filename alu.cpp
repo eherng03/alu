@@ -6,7 +6,21 @@ alu::alu(){
 }
 
 std::vector<int> alu::obtenerSignificativo(int exponente, floatIEEE *operando){
+    std::vector<int> significativo;
+    significativo.push_back(1);
+    for(int i = 0; i < exponente; i++){
+        significativo.push_back(operando->getMantisa().at(i));
+    }
+}
 
+int alu::verExponente(floatIEEE *operando1, floatIEEE *operando2){
+    int exponenteParaOperar = 0;
+    if(operando1->exponenteADecimal() > operando2->exponenteADecimal()){
+        exponenteParaOperar = operando1->exponenteADecimal() - operando2->exponenteADecimal();
+    }else{
+        exponenteParaOperar = operando2->exponenteADecimal() - operando1->exponenteADecimal();
+    }
+    return exponenteParaOperar;
 }
 
 floatIEEE alu::producto(floatIEEE *operando1, floatIEEE *operando2){
