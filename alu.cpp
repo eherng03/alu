@@ -1,14 +1,22 @@
 #include "alu.h"
+#include <floatieee.h>
 
 alu::alu(){
 
 }
 
-std::vector<int> alu::producto(std::vector<int> operando1, std::vector<int> operando2){
+std::vector<int> alu::obtenerSignificativo(int exponente, floatIEEE *operando){
 
 }
 
-std::vector<int> alu::suma(std::vector<int> operando1, std::vector<int> operando2){
+floatIEEE alu::producto(floatIEEE *operando1, floatIEEE *operando2){
+
+}
+
+floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
+
+    //DENTRO DE SUMA HAY QUE HACER SUMAR Y RESTAR
+
 //    int carry = 0;
 //    //mirar a ver como se introducen los datos en los operadores
 //    for(int i = 0; i < 32; i++){
@@ -28,6 +36,6 @@ std::vector<int> alu::suma(std::vector<int> operando1, std::vector<int> operando
 //    }
 }
 
-std::vector<int> alu::division(std::vector<int> operando1, std::vector<int> operando2){
+floatIEEE alu::division(floatIEEE* operando1, floatIEEE* operando2){
 
 }
