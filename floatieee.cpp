@@ -1,8 +1,11 @@
 #include "floatieee.h"
 #include <string>
+#include <string.h>
+#include <sstream>
 #include <vector>
 #include <bitset>
 #include <math.h>
+#include <ostream>
 
 floatIEEE::floatIEEE(){
 
@@ -60,40 +63,92 @@ std::vector<int> floatIEEE::getFloatingPoint( float value, std::string* cadena){
     return resultado;
 }
 
-int floatIEEE::getHexadecimal()
-{
-    std::bitset<32> set(cadenaNumeroPasado);
-    int hex = set.to_ulong();
+float floatIEEE::getNumero(){
+    return numero;
+}
 
-    return hex;
+
+
+
+std::string floatIEEE::getHexadecimal()
+{
+   std::string hexadecimal;
+   hexadecimal.append("0x");
+   std::string bitsParaPasar;
+   for(int i = 0; i < 32; i){
+       bitsParaPasar.clear();
+       for(int j = 0; j < 4; j++){
+           std::ostringstream temp;  //temp as in temporary
+           temp << numeroPasado.at(i);
+           bitsParaPasar.append(temp.str());
+           i++;
+       }
+
+
+       if(bitsParaPasar.compare("0000") == 0){
+           hexadecimal.append("0");
+       }else if(bitsParaPasar.compare("0001") == 0){
+           hexadecimal.append("1");
+       }else if(bitsParaPasar.compare("0010") == 0){
+           hexadecimal.append("2");
+       }else if(bitsParaPasar.compare("0011") == 0){
+           hexadecimal.append("3");
+       }else if(bitsParaPasar.compare("0100") == 0){
+           hexadecimal.append("4");
+       }else if(bitsParaPasar.compare("0101") == 0){
+           hexadecimal.append("5");
+       }else if(bitsParaPasar.compare("0110") == 0){
+           hexadecimal.append("6");
+       }else if(bitsParaPasar.compare("0111") == 0){
+           hexadecimal.append("7");
+       }else if(bitsParaPasar.compare("1000") == 0){
+           hexadecimal.append("8");
+       }else if(bitsParaPasar.compare("1001") == 0){
+           hexadecimal.append("9");
+       }else if(bitsParaPasar.compare("1010") == 0){
+           hexadecimal.append("A");
+       }else if(bitsParaPasar.compare("1011") == 0){
+           hexadecimal.append("B");
+       }else if(bitsParaPasar.compare("1100") == 0){
+           hexadecimal.append("C");
+       }else if(bitsParaPasar.compare("1101") == 0){
+           hexadecimal.append("D");
+       }else if(bitsParaPasar.compare("1110") == 0){
+           hexadecimal.append("E");
+       }else if(bitsParaPasar.compare("1111") == 0){
+           hexadecimal.append("F");
+       }
+   }
+   return hexadecimal;
 }
 
 // Convert the 32-bit binary into the decimal
 float floatIEEE::getDecimal(){
-    int HexNumber = getHexadecimal();
+//    std::string HexNumber = getHexadecimal();
 
-    bool negative  = !!(HexNumber & 0x80000000);
-    int  exponent  =   (HexNumber & 0x7f800000) >> 23;
-    int sign = negative ? -1 : 1;
 
-    // Subtract 127 from the exponent
-    exponent -= 127;
+//    bool negative  = !!(HexNumber & 0x80000000);
+//    int  exponent  =   (HexNumber & 0x7f800000) >> 23;
+//    int sign = negative ? -1 : 1;
 
-    // Convert the mantissa into decimal using the
-    // last 23 bits
-    int power = -1;
-    float total = 0.0;
-    for ( int i = 0; i < 23; i++ )
-    {
-        int c = cadenaNumeroPasado[ i + 9 ] - '0';
-        total += (float) c * (float) pow( 2.0, power );
-        power--;
-    }
-    total += 1.0;
+//    Subtract 127 from the exponent
+//    exponent -= 127;
 
-    float value = sign * (float) pow( 2.0, exponent ) * total;
+//    //Convert the mantissa into decimal using the
+//    last 23 bits
+//    int power = -1;
+//    float total = 0.0;
+//    for ( int i = 0; i < 23; i++ )
+//    {
+//        int c = cadenaNumeroPasado[ i + 9 ] - '0';
+//        total += (float) c * (float) pow( 2.0, power );
+//        power--;
+//    }
+//    total += 1.0;
 
-    return value;
+//    float value = sign * (float) pow( 2.0, exponent ) * total;
+
+    return NULL;   //return value;
 }
 
 std::vector<int> floatIEEE::getMantisa(){

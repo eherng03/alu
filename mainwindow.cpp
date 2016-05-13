@@ -39,7 +39,9 @@ void MainWindow::on_runButton_clicked()
     operandoBin1 = new floatIEEE(operando1);
     operandoBin2 = new floatIEEE(operando2);
 
-    int jamon = operandoBin1->getHexadecimal();
+
+    std::string operando1Hex = operandoBin1->getHexadecimal();
+    //std::string jamon = operandoBin1->getHexadecimal();
 
     std::string operacion = ui->comboBoxOperacion->currentText().toStdString();
 
