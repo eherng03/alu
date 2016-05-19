@@ -23,14 +23,6 @@ MainWindow::~MainWindow()
 
 
 
-// Convert the 32-bit binary encoding into hexadecimal
-
-
-
-
-
-
-
 void MainWindow::on_runButton_clicked()
 {
     int i;
@@ -40,8 +32,11 @@ void MainWindow::on_runButton_clicked()
     operandoBin2 = new floatIEEE(operando2);
 
 
-    std::string operando1Hex = operandoBin1->getHexadecimal();
-    //std::string jamon = operandoBin1->getHexadecimal();
+    QString operando1Hex = operandoBin1->getHexadecimal();
+    QString operando2Hex = operandoBin2->getHexadecimal();
+
+    ui->operando1Hex->setText(operando1Hex);
+    ui->operando2Hex->setText(operando2Hex);
 
     std::string operacion = ui->comboBoxOperacion->currentText().toStdString();
 
@@ -53,7 +48,10 @@ void MainWindow::on_runButton_clicked()
         *result = myAlu.division(operandoBin1, operandoBin2);
     }
 
-    //ui->operando1Hex->setText(QString::fromStdString(lexical_cast<std::string>(binary2Hex(operandoBin1.aCadena())));
-    //ui->operando2Hex->setText(QString::fromStdString(operando2bitstring));
-    //ui->resultadoHex->setText(QString::fromStdString(operando2bitstring));
+    QString resultHex = result->getHexadecimal();
+
+    ui->resultadoHex->setText(resultHex);
 }
+
+
+

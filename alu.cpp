@@ -1,5 +1,6 @@
 #include "alu.h"
 #include <floatieee.h>
+#include <stdlib.h>
 
 alu::alu(){
 
@@ -28,41 +29,91 @@ int alu::verExponente(floatIEEE *operando1, floatIEEE *operando2){
 }
 
 floatIEEE alu::producto(floatIEEE *operando1, floatIEEE *operando2){
+   // floatIEEE resultado = new floatIEEE();
 
 }
 
 floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
-
+    floatIEEE resultado;
+    std::vector<int> mantisaResultado;
     int desplazamiento = verExponente(operando1, operando2);
     std::vector<int> operando1ParaOperar;
     std::vector<int> operando2ParaOperar;
-    if(operando1->getNumero() < operando2->getNumero()){
+    if(abs(operando1->getNumero()) < abs(operando2->getNumero())){
         operando1ParaOperar = obtenerSignificativo(desplazamiento, operando1);
         operando2ParaOperar = obtenerSignificativo(0, operando2);
     }else{
         operando2ParaOperar = obtenerSignificativo(desplazamiento, operando2);
         operando1ParaOperar = obtenerSignificativo(0, operando1);
     }
+    //si los dos tienen el mismo signo se suman
+    if(operando1->getSigno() == operando2->getSigno()){
+        mantisaResultado = sumar(operando1ParaOperar, operando2ParaOperar);
 
-    //DENTRO DE SUMA HAY QUE HACER SUMAR Y RESTAR
+     //si tienen signo diferente se resta del mayor en valor absoluto el menor
+    }else{
+        if(abs(operando1->getNumero()) < abs(operando2->getNumero())){
+            mantisaResultado = restar(operando2ParaOperar, operando1ParaOperar);
+        }else{
+            mantisaResultado = restar(operando1ParaOperar, operando2ParaOperar);
+        }
+    }
+    return resultado;
+}
 
-//    int carry = 0;
-//    //mirar a ver como se introducen los datos en los operadores
-//    for(int i = 0; i < 32; i++){
-//        if(operando1[i] + operando2[i] + carry == 0){
-//            resultado[i] = 0;
-//            carry = 0;
-//        }else if(operando1[i] + operando2[i] + carry == 1){
-//            resultado[i] = 1;
-//            carry = 0;
-//        }else if(operando1[i] + operando2[i] + carry == 2){
-//            resultado[i] = 0;
-//            carry = 1;
-//        }else if(operando1[i] + operando2[i] + carry > 2){
-//            resultado[i] = 1;
-//            carry = 1;
-//        }
-//    }
+std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando2){
+    int carry = 0;
+    std::vector<int> resultado;
+        for(int i = 31; i >= 0; i--){
+            if(sumando1.at(i) + sumando2.at(i) + carry == 0){
+               resultado.at(i) = 0;
+                carry = 0;
+            }else if(sumando1.at(i) + sumando2.at(i) + carry == 1){
+                resultado.at(i) = 1;
+                carry = 0;
+            }else if(sumando1.at(i) + sumando2.at(i) + carry == 2){
+                resultado.at(i) = 0;
+                carry = 1;
+            }else if(sumando1.at(i) + sumando2.at(i) + carry > 2){
+                resultado.at(i) = 1;
+                carry = 1;
+            }
+        }
+     return resultado;
+}
+
+
+std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustraendo){
+    int carry = 0;
+    std::vector<int> resultado;
+        for(int i = 31; i >= 0; i--){
+            if(minuendo.at(i) == 0 && sustraendo.at(i) == 0 && carry == 0){
+               resultado.at(i) = 0;
+               carry = 0;
+            }else if(minuendo.at(i) == 0 && sustraendo.at(i) == 0 && carry == 1){
+                resultado.at(i) = 1;
+                carry = 1;
+            }else if(minuendo.at(i) == 0 && sustraendo.at(i) == 1 && carry == 0){
+                resultado.at(i) = 1;
+                carry = 1;
+            }else if(minuendo.at(i) == 0 && sustraendo.at(i) == 1 && carry == 1){
+                resultado.at(i) = 0;
+                carry = 0;
+            }else if(minuendo.at(i) == 1 && sustraendo.at(i) == 0 && carry == 0){
+                resultado.at(i) = 1;
+                carry = 0;
+            }else if(minuendo.at(i) == 1 && sustraendo.at(i) == 0 && carry == 1){
+                resultado.at(i) = 0;
+                carry = 0;
+            }else if(minuendo.at(i) == 1 && sustraendo.at(i) == 1 && carry == 0){
+                resultado.at(i) = 0;
+                carry = 0;
+            }else if(minuendo.at(i) == 1 && sustraendo.at(i) == 1 && carry == 1){
+                resultado.at(i) = 1;
+                carry = 0;
+            }
+        }
+     return resultado;
 }
 
 floatIEEE alu::division(floatIEEE* operando1, floatIEEE* operando2){

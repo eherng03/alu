@@ -6,6 +6,7 @@
 #include <bitset>
 #include <math.h>
 #include <ostream>
+#include <QString>
 
 floatIEEE::floatIEEE(){
 
@@ -70,17 +71,17 @@ float floatIEEE::getNumero(){
 
 
 
-std::string floatIEEE::getHexadecimal()
+QString floatIEEE::getHexadecimal()
 {
-   std::string hexadecimal;
+   QString hexadecimal;
    hexadecimal.append("0x");
-   std::string bitsParaPasar;
+   QString bitsParaPasar;
    for(int i = 0; i < 32; i){
        bitsParaPasar.clear();
        for(int j = 0; j < 4; j++){
            std::ostringstream temp;  //temp as in temporary
            temp << numeroPasado.at(i);
-           bitsParaPasar.append(temp.str());
+           bitsParaPasar.append(QString::fromStdString(temp.str()));
            i++;
        }
 
@@ -157,12 +158,18 @@ std::vector<int> floatIEEE::getMantisa(){
 
 int floatIEEE::exponenteADecimal(){
     int result = 0;
+    int j = 7;
     for(int i = 0; i < exponente.size(); i++){
-        result = result + pow(2, i)*exponente.at(i);
+        result = result + pow(2, i)*exponente.at(j);
+        j--;
     }
     return result;
 }
 
 std::string floatIEEE::aCadena(){
     return cadenaNumeroPasado;
+}
+
+int floatIEEE::getSigno(){
+    return signo;
 }

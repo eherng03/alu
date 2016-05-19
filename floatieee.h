@@ -5,6 +5,7 @@
 #include <string>
 #include <bitset>
 #include <string.h>
+#include <QString>
 
 class floatIEEE
 {
@@ -12,13 +13,14 @@ public:
     floatIEEE();
     floatIEEE(float numero);
     floatIEEE(std::vector<int> numero);
-    std::string getHexadecimal();
+    QString getHexadecimal();
     std::vector<int> getFloatingPoint( float value, std::string* cadena);
     float getDecimal();
     std::string aCadena();
     int exponenteADecimal();
     std::vector<int> getMantisa();
     float getNumero();
+    int getSigno();
 private:
     int signo;
     float numero;
