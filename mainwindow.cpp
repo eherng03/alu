@@ -48,6 +48,7 @@ void MainWindow::on_runButton_clicked()
         *result = myAlu.division(operandoBin1, operandoBin2);
     }
 
+
     QString resultHex = result->getHexadecimal();
 
     ui->resultadoHex->setText(resultHex);

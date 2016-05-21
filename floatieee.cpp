@@ -173,3 +173,29 @@ std::string floatIEEE::aCadena(){
 int floatIEEE::getSigno(){
     return signo;
 }
+
+void floatIEEE::setSigno(int signo){
+    this->signo = signo;
+}
+
+void floatIEEE::setExponente(std::vector<int> exponente){
+    this->exponente = exponente;
+}
+
+void floatIEEE::setMantisa(std::vector<int> mantisa){
+    this->mantisa = mantisa;
+}
+
+void floatIEEE::procesarNumero(){
+    int i;
+    this->numeroPasado.push_back(this->signo);
+    this->numeroPasado.push_back(this->exponente);
+    this->numeroPasado.push_back(this->mantisa);
+
+    for(i = 0; i < this->numeroPasado.size(); i++){
+        this->cadenaNumeroPasado.append(this->numeroPasado.at(i));
+    }
+
+    this->numero = this->getDecimal();
+
+}
