@@ -23,8 +23,9 @@ class floatIEEE
         int getSigno();
         void setSigno(int signo);
         void setExponente(std::vector<int> exponente);
+        void setExponente(int exponenteDecimal);
         void setMantisa(std::vector<int> mantisa);
-        void procesarNumero():      //con el signo, exponente y mantisa ya introducidos, calcula el resto de atributos
+        void procesarNumero();      //con el signo, exponente y mantisa ya introducidos, calcula el resto de atributos
 
     private:
         int signo;

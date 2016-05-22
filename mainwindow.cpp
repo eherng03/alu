@@ -50,7 +50,9 @@ void MainWindow::on_runButton_clicked()
 
 
     QString resultHex = result->getHexadecimal();
-
+    QString resultFloat;
+    resultFloat.setNum(result->getNumero());
+    ui->resultado->setText(resultFloat);
     ui->resultadoHex->setText(resultHex);
 }
 

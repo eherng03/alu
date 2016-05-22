@@ -38,6 +38,7 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
     floatIEEE resultado;
     std::vector<int> mantisaResultado;
     int desplazamiento = verExponente(operando1, operando2);
+    int exponenteDecimal;
     std::vector<int> operando1ParaOperar;
     std::vector<int> operando2ParaOperar;
 
@@ -54,25 +55,44 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
     if(operando1->getSigno() == operando2->getSigno()){
         mantisaResultado = sumar(operando1ParaOperar, operando2ParaOperar);
         resultado.setSigno(operando1->getSigno());
+        if(mantisaResultado.size() != 24){
 
-        //tener en cuenta que debido al acarreo la mantisa nueva puede tener 25 bits, meter solo los 24 primeros
-        //exponente
+        }
 
      //si tienen signo diferente se resta del mayor en valor absoluto el menor
     }else{
         if(abs(operando1->getNumero()) < abs(operando2->getNumero())){
             mantisaResultado = restar(operando2ParaOperar, operando1ParaOperar);
             resultado.setSigno(operando2->getSigno());
-            resultado.setMantisa(mantisaResultado);
-            //exponente del mayor?
         }else{
             mantisaResultado = restar(operando1ParaOperar, operando2ParaOperar);
             resultado.setSigno(operando1->getSigno());
-            resultado.setMantisa(mantisaResultado);
-            //exponente del mayor?
         }
     }
 
+    //comprobamos la dimensión de la mantisa, si es diferente de 23 habrá que cambiar el exponente
+    if(mantisaResultado.size() != 23){
+        if(operando1->exponenteADecimal() > operando2->exponenteADecimal()){
+            exponenteDecimal = operando1->exponenteADecimal() + (mantisaResultado.size() - 23);
+
+        }else{
+            exponenteDecimal = operando2->exponenteADecimal() + (mantisaResultado.size() - 23);
+        }
+    }
+
+    resultado.setExponente(exponenteDecimal);
+
+    //Procesamos la mantisa
+    if(mantisaResultado.size() > 23){
+        while(mantisaResultado.size() > 23){
+            mantisaResultado.pop_back();
+        }
+    }else if(mantisaResultado.size() < 23){
+        while(mantisaResultado.size() < 23){
+            mantisaResultado.push_back(0);
+        }
+    }
+    resultado.setMantisa(mantisaResultado);
 
     //Meter todo al floatieee resultado
     resultado.procesarNumero();
@@ -100,9 +120,11 @@ std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando
             carry = 1;
         }
     }
-    resultadoAux.push_back(carry);
+    if(carry == 1){
+        resultadoAux.push_back(carry);
+    }
 
-    for(j = resultadoAux.size() - 1; j >= 0; j--){       //Para darle la vuelta al resultado
+    for(j = resultadoAux.size() - 2; j >= 0; j--){       //Para darle la vuelta al resultado
         resultado.push_back(resultadoAux.at(j));
     }
     return resultado;
@@ -113,6 +135,7 @@ std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustra
     int carry = 0;
     int i;
     int j;
+    int x;
     std::vector<int> resultadoAux;
     std::vector<int> resultado;
     for(i = minuendo.size() - 1; i >= 0; i--){
@@ -143,9 +166,18 @@ std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustra
         }
     }
 
-    for(j = resultadoAux.size() - 1; j >= 0; j--){       //Para darle la vuelta al resultado
-        resultado.push_back(resultadoAux.at(j));
+    //como al principio puede haber ceros, en x guardamos el indice del primer uno
+    x = resultadoAux.size() - 1;
+    while(resultadoAux.at(x) == 0){
+          x--;
     }
+
+    //empieza en x - 1, obviando el primer uno del resultado para que nos de la mantisa (aunque puede tener menor dimension que 23, lo miramos luego)
+    for(j = x - 1; j >= 0; j--){      //Para darle la vuelta al resultado
+            resultado.push_back(resultadoAux.at(j));
+    }
+
+
     return resultado;
 }
 

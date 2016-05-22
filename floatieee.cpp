@@ -123,33 +123,18 @@ QString floatIEEE::getHexadecimal()
    return hexadecimal;
 }
 
-// Convert the 32-bit binary into the decimal
+//Método que pasa el float en IEEE entero a su equivalente en float, y ala vez lo amacena en su atributo
 float floatIEEE::getDecimal(){
-//    std::string HexNumber = getHexadecimal();
+    float mantisaFloat;
+    float resultado;
 
+    for(int i = 1; i < mantisa.size(); i++){
+        mantisaFloat = mantisaFloat + (mantisa.at(i-1)*(1/(pow(2, i))));
+    }
 
-//    bool negative  = !!(HexNumber & 0x80000000);
-//    int  exponent  =   (HexNumber & 0x7f800000) >> 23;
-//    int sign = negative ? -1 : 1;
-
-//    Subtract 127 from the exponent
-//    exponent -= 127;
-
-//    //Convert the mantissa into decimal using the
-//    last 23 bits
-//    int power = -1;
-//    float total = 0.0;
-//    for ( int i = 0; i < 23; i++ )
-//    {
-//        int c = cadenaNumeroPasado[ i + 9 ] - '0';
-//        total += (float) c * (float) pow( 2.0, power );
-//        power--;
-//    }
-//    total += 1.0;
-
-//    float value = sign * (float) pow( 2.0, exponent ) * total;
-
-    return NULL;   //return value;
+    resultado = pow(-1, signo) * (1 + mantisaFloat) * pow(2, exponenteADecimal() - 127);
+    numero = resultado;
+    return resultado;
 }
 
 std::vector<int> floatIEEE::getMantisa(){
@@ -182,20 +167,45 @@ void floatIEEE::setExponente(std::vector<int> exponente){
     this->exponente = exponente;
 }
 
+void floatIEEE::setExponente(int exponenteDecimal){
+    std::vector<int> exponenteAux;
+    int numeroCerosAnadir = 0;
+    exponenteDecimal = exponenteDecimal + 127;
+    while(exponenteDecimal > 1){
+        exponenteAux.push_back(exponenteDecimal % 2);
+        exponenteDecimal = exponenteDecimal / 2;
+    }
+    exponenteAux.push_back(1);
+    if(exponenteAux.size() < 8){
+        numeroCerosAnadir = 8 - exponenteAux.size();
+    }
+    for(int i = 0; i < numeroCerosAnadir; i++){
+        exponente.push_back(0);
+    }
+    for(int j = 0; j < exponenteAux.size(); j++){
+        exponente.push_back(exponenteAux.at(j));
+    }
+}
+
 void floatIEEE::setMantisa(std::vector<int> mantisa){
     this->mantisa = mantisa;
 }
 
 void floatIEEE::procesarNumero(){
-    int i;
-    this->numeroPasado.push_back(this->signo);
-    this->numeroPasado.push_back(this->exponente);
-    this->numeroPasado.push_back(this->mantisa);
+    numeroPasado.push_back(signo);
+    for(int x = 0; x < exponente.size(); x++){
+        numeroPasado.push_back(exponente.at(x));
+    }
+    for(int y = 0; y < mantisa.size(); y++){
+        numeroPasado.push_back(mantisa.at(y));
+    }
 
-    for(i = 0; i < this->numeroPasado.size(); i++){
-        this->cadenaNumeroPasado.append(this->numeroPasado.at(i));
+    for(int i = 0; i < this->numeroPasado.size(); i++){
+        this->cadenaNumeroPasado.append((char*) this->numeroPasado.at(i));
     }
 
     this->numero = this->getDecimal();
 
 }
+
+
