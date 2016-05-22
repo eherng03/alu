@@ -6,6 +6,7 @@
 #include <string.h>
 #include <alu.h>
 #include <vector>
+#include <floatieee.h>
 
 namespace Ui {
 class MainWindow;
@@ -20,8 +21,6 @@ public:
     ~MainWindow();
     int binary2Hex(std::string Binary);
     float getFloat32(std::string Binary);
-    std::vector<int> getBinary32(float value, std::string *cadena);
-
 
 private slots:
     void on_runButton_clicked();
@@ -30,12 +29,9 @@ private:
     Ui::MainWindow *ui;
     float operando1;
     float operando2;
-    std::vector<int> operandoBin1;
-    std::vector<int> operandoBin2;
-    std::vector<int> result;
-    std::string operando1bitstring;
-    std::string operando2bitstring;
-    std::string resultbitstring;
+    floatIEEE* operandoBin1;
+    floatIEEE* operandoBin2;
+    floatIEEE result;
     alu myAlu;
 };
 
