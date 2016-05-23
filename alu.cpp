@@ -48,6 +48,7 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     std::vector<int> mantisaResultado;
     std::vector<int> mantisaDividendoAux;
     std::vector<int> mantisaDivisorAux;
+    std::vector<int> mantisaFinal;
 
     //el signo es negativo si los signos son diferentes
     if(dividendo->getSigno() != divisor->getSigno()){
@@ -55,6 +56,9 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     }else{ //el signo es positivo si los signos son iguales
         resultado.setSigno(0);
     }
+
+    int exponente = dividendo->exponenteADecimal() - divisor->exponenteADecimal();
+
     //le pongo el 1 que omite la mantisa para operar con ello
     mantisaDividendo.push_back(1);
     mantisaDivisor.push_back(1);
@@ -74,23 +78,32 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     for(int j = 0; j < 23; j++){
         mantisaDividendoAux.clear();
         mantisaDivisorAux.clear();
+        int desplazamiento = verExponente(dividendo, divisor);
+        //Obtenemos la parte significativa desplazando las mantisas
+        if(abs(dividendo->getNumero()) < abs(divisor->getNumero())){
+            mantisaDividendo = obtenerSignificativo(desplazamiento, dividendo);
+            mantisaDivisor = obtenerSignificativo(0, divisor);
+        }else{
+            mantisaDivisor = obtenerSignificativo(desplazamiento, divisor);
+            mantisaDividendo = obtenerSignificativo(0, dividendo);
+        }
         if(mantisaDividendo >= mantisaDivisor){
-            int desplazamiento = verExponente(dividendo, divisor);
-            //Obtenemos la parte significativa desplazando las mantisas
-            if(abs(dividendo->getNumero()) < abs(divisor->getNumero())){
-                mantisaDividendo = obtenerSignificativo(desplazamiento, dividendo);
-                mantisaDivisor = obtenerSignificativo(0, divisor);
+
+            if(mantisaDividendo == mantisaDivisor){
+                for(int x = 0; x < 23; x++){
+                    mantisaDividendo.push_back(0);
+                }
             }else{
-                mantisaDivisor = obtenerSignificativo(desplazamiento, divisor);
-                mantisaDividendo = obtenerSignificativo(0, dividendo);
+                mantisaDividendoAux = restar(mantisaDividendo, mantisaDivisor);
+                mantisaDividendo.clear();
+                mantisaDividendo.push_back(1);
+                for(int x = 0; x < mantisaDividendoAux.size(); x++){
+                    mantisaDividendo.push_back(mantisaDividendoAux.at(x));
+                }
             }
-           mantisaDividendoAux = restar(mantisaDividendo, mantisaDivisor);
-           mantisaDividendo.clear();
-           mantisaDividendo.push_back(1);
-           for(int x = 0; x < mantisaDividendoAux.size(); x++){
-               mantisaDividendo.push_back(mantisaDividendoAux.at(x));
-           }
+
            mantisaResultado.push_back(1);
+
         }else{
            mantisaResultado.push_back(0);
         }
@@ -100,10 +113,20 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
         }
         mantisaDivisor = mantisaDivisorAux;
     }
-    //le doy la vuelta a la mantisaResultado para guardarla bien en el atributo de resultado
-    for(int k = mantisaResultado.size() - 1; k >= 0; k--){
-        resultado.getMantisa().push_back(mantisaResultado.at(k));
+
+    int primeraPosicionMantisa = 0;
+    while(mantisaResultado.at(primeraPosicionMantisa) == 0){
+        primeraPosicionMantisa++;
     }
+    primeraPosicionMantisa++;
+    exponente = exponente - primeraPosicionMantisa;
+
+    for(int k = primeraPosicionMantisa; k < 23; k++){
+        mantisaFinal.push_back(mantisaResultado.at(k));
+    }
+    resultado.setMantisa(mantisaFinal);
+    resultado.setExponente(exponente);
+
     resultado.procesarNumero();
 
     return resultado;
