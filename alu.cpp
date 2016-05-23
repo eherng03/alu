@@ -41,9 +41,7 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     }
 }
 
-std::vector<int> alu::restarMantisas(std::vector<int> mantisa1, std::vector<int> mantisa2){
 
-}
 
 floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     floatIEEE resultado;
@@ -91,7 +89,7 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
                     mantisaDividendo.push_back(0);
                 }
             }else{              //si no las restamos
-                mantisaDividendoAux = restarMantisas(mantisaDividendo, mantisaDivisor, true);
+                mantisaDividendoAux = restar(mantisaDividendo, mantisaDivisor, true);
                 mantisaDividendo.clear();
                 mantisaDividendo = mantisaDividendoAux;
             }
@@ -162,12 +160,13 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
      //si tienen signo diferente se resta del mayor en valor absoluto el menor
     }else{
         if(abs(operando1->getNumero()) < abs(operando2->getNumero())){
-            mantisaResultado = restar(operando2ParaOperar, operando1ParaOperar);
+            mantisaResultado = restar(operando2ParaOperar, operando1ParaOperar, false);
             resultado.setSigno(operando2->getSigno());
-        }else{
-            mantisaResultado = restar(operando1ParaOperar, operando2ParaOperar);
+        }else if(abs(operando1->getNumero()) > abs(operando2->getNumero())){
+            mantisaResultado = restar(operando1ParaOperar, operando2ParaOperar, false);
             resultado.setSigno(operando1->getSigno());
         }
+
     }
 
     //comprobamos la dimensión de la mantisa, si es diferente de 23 habrá que cambiar el exponente
@@ -177,6 +176,13 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
 
         }else{
             exponenteDecimal = operando2->exponenteADecimal() + (mantisaResultado.size() - 23);
+        }
+    }else{      //Si no tiene el mismo exponente que el mayor
+        if(operando1->exponenteADecimal() > operando2->exponenteADecimal()){
+            exponenteDecimal = operando1->exponenteADecimal();
+
+        }else{
+            exponenteDecimal = operando2->exponenteADecimal();
         }
     }
 
