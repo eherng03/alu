@@ -41,6 +41,10 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     }
 }
 
+std::vector<int> alu::restarMantisas(std::vector<int> mantisa1, std::vector<int> mantisa2){
+
+}
+
 floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     floatIEEE resultado;
     std::vector<int> mantisaDividendo;
@@ -62,6 +66,7 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     //le pongo el 1 que omite la mantisa para operar con ello
     mantisaDividendo.push_back(1);
     mantisaDivisor.push_back(1);
+
     for(int i = dividendo->getMantisa().size() - 1; i >= 0; i--){
         mantisaDividendo.push_back(dividendo->getMantisa().at(i));
         mantisaDivisor.push_back(divisor->getMantisa().at(i));
@@ -78,28 +83,17 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
     for(int j = 0; j < 23; j++){
         mantisaDividendoAux.clear();
         mantisaDivisorAux.clear();
-        int desplazamiento = verExponente(dividendo, divisor);
-        //Obtenemos la parte significativa desplazando las mantisas
-        if(abs(dividendo->getNumero()) < abs(divisor->getNumero())){
-            mantisaDividendo = obtenerSignificativo(desplazamiento, dividendo);
-            mantisaDivisor = obtenerSignificativo(0, divisor);
-        }else{
-            mantisaDivisor = obtenerSignificativo(desplazamiento, divisor);
-            mantisaDividendo = obtenerSignificativo(0, dividendo);
-        }
+
         if(mantisaDividendo >= mantisaDivisor){
 
-            if(mantisaDividendo == mantisaDivisor){
+            if(mantisaDividendo == mantisaDivisor){ //Si son iguales la resta da 0
                 for(int x = 0; x < 23; x++){
                     mantisaDividendo.push_back(0);
                 }
-            }else{
-                mantisaDividendoAux = restar(mantisaDividendo, mantisaDivisor);
+            }else{              //si no las restamos
+                mantisaDividendoAux = restarMantisas(mantisaDividendo, mantisaDivisor, true);
                 mantisaDividendo.clear();
-                mantisaDividendo.push_back(1);
-                for(int x = 0; x < mantisaDividendoAux.size(); x++){
-                    mantisaDividendo.push_back(mantisaDividendoAux.at(x));
-                }
+                mantisaDividendo = mantisaDividendoAux;
             }
 
            mantisaResultado.push_back(1);
@@ -107,23 +101,32 @@ floatIEEE alu::division(floatIEEE* dividendo, floatIEEE* divisor){
         }else{
            mantisaResultado.push_back(0);
         }
+        //Desplazamos a la derecha la mantisa divisor
         mantisaDivisorAux.push_back(0);
         for(int y = 0; y < mantisaDivisor.size() - 2; y++){
             mantisaDivisorAux.push_back(mantisaDivisor.at(y));
         }
         mantisaDivisor = mantisaDivisorAux;
     }
-
+    //busco el primer uno
     int primeraPosicionMantisa = 0;
     while(mantisaResultado.at(primeraPosicionMantisa) == 0){
         primeraPosicionMantisa++;
     }
-    primeraPosicionMantisa++;
-    exponente = exponente - primeraPosicionMantisa;
 
-    for(int k = primeraPosicionMantisa; k < 23; k++){
+    //omito el primer uno
+    primeraPosicionMantisa++;
+    //calculo el exponente
+    exponente = exponente - primeraPosicionMantisa;
+    //calculo la mantisa a partir de omitir el primer uno
+    for(int k = primeraPosicionMantisa; k < mantisaResultado.size(); k++){
         mantisaFinal.push_back(mantisaResultado.at(k));
     }
+    while(mantisaFinal.size() != 23){
+        mantisaFinal.push_back(0);
+    }
+
+    //meto todo en el resultado
     resultado.setMantisa(mantisaFinal);
     resultado.setExponente(exponente);
 
@@ -228,7 +231,7 @@ std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando
 }
 
 
-std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustraendo){
+std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustraendo, bool restaMantisas){
     int carry = 0;
     int i;
     int j;
@@ -264,13 +267,19 @@ std::vector<int> alu::restar(std::vector<int> minuendo,  std::vector<int> sustra
     }
 
     //como al principio puede haber ceros, en x guardamos el indice del primer uno
+    //Fuera del metodo miramos si ambas son iguales para que la resta nunca de 0 y asi no se salfa de resultadoAux
     x = resultadoAux.size() - 1;
     while(resultadoAux.at(x) == 0){
           x--;
     }
 
+    if(restaMantisas){      //Si restamos las mantisas para la operacion de la dividision no le quitamos el primer uno
+        j = x;
+    }else{
+        j = x - 1;
+    }
     //empieza en x - 1, obviando el primer uno del resultado para que nos de la mantisa (aunque puede tener menor dimension que 23, lo miramos luego)
-    for(j = x - 1; j >= 0; j--){      //Para darle la vuelta al resultado
+    for(j; j >= 0; j--){      //Para darle la vuelta al resultado
             resultado.push_back(resultadoAux.at(j));
     }
 
