@@ -32,6 +32,13 @@ int alu::verExponente(floatIEEE *operando1, floatIEEE *operando2){
 floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     floatIEEE resultado;
     int exponenteResultado;
+    int iteracciones;
+    int numeroAMultiplicar = 0;
+    std::vector<int> multiplicando = factor1->getMantisa();
+    std::vector<int> multiplicador = factor2->getMantisa();
+    std::vector<int> vectorAux1;            //La suma en cada iteraccion, del actual con los anteriores sumados
+    std::vector<int> vectorAux2;
+    std::vector<int> mantisaFinal;
     exponenteResultado = factor1->exponenteADecimal() + factor2->exponenteADecimal();
     resultado.setExponente(exponenteResultado);
     if(factor1->getSigno() != factor2->getSigno()){
@@ -39,6 +46,43 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     }else{
         resultado.setSigno(0);
     }
+
+    //Necesitamos tantas iteracciones como bits tiene el multiplicador
+    iteracciones = multiplicador.size() - 1;
+    //El primer vector auxiliar1 es la primera multiplicacion, los siguientes son la suma de los dos anteriores
+    vectorAux1.push_back(0);        //Añado un 0 para poder sumarlo mas tarde
+    numeroAMultiplicar = multiplicador.at(iteracciones);
+    for(int i = 0; i > multiplicando.size() ; i--){     //recorre los elementos del multiplicando
+        vectorAux1.push_back(multiplicando.at(i) * numeroAMultiplicar);
+    }
+    iteracciones--;
+    while(iteracciones >= 0){            //recorre los elementos del multiplicador(el de abajo)
+
+        numeroAMultiplicar = multiplicador.at(iteracciones);
+        for(int i = 0; i > multiplicando.size() ; i--){     //recorre los elementos del multiplicando
+            vectorAux2.push_back(multiplicando.at(i) * numeroAMultiplicar);
+        }
+
+        vectorAux2.push_back(0);
+
+        std::vector<int> jamon = sumar(vectorAux1, vectorAux2, true);       //Cambiarle el nobre jeje
+        if(jamon.size() - 1 == vectorAux2.size()){
+            vectorAux1.push_back(0);
+        }
+        vectorAux1.insert(vectorAux1.end(), jamon.begin(), jamon.end() );
+
+        iteracciones--;
+    }
+
+    //VectorAux1 va a ser un vector de 46 elementos, seleccionamos solo los 23 primeros
+    for(int i = 0; i < 23; i++){
+        mantisaFinal.push_back(vectorAux1.at(i));
+    }
+
+    resultado.setMantisa(mantisaFinal);
+    resultado.procesarNumero();
+    return resultado;
+
 }
 
 
@@ -162,7 +206,7 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
 
     //si los dos tienen el mismo signo se suman
     if(operando1->getSigno() == operando2->getSigno()){
-        mantisaResultado = sumar(operando1ParaOperar, operando2ParaOperar);
+        mantisaResultado = sumar(operando1ParaOperar, operando2ParaOperar, false);
         resultado.setSigno(operando1->getSigno());
 
      //si tienen signo diferente se resta del mayor en valor absoluto el menor
@@ -213,7 +257,7 @@ floatIEEE alu::suma(floatIEEE* operando1, floatIEEE* operando2){
     return resultado;
 }
 
-std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando2){
+std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando2, bool sumaMantisas){
     int carry = 0;
     int i;
     int j;
@@ -237,8 +281,13 @@ std::vector<int> alu::sumar(std::vector<int> sumando1,  std::vector<int> sumando
     if(carry == 1){
         resultadoAux.push_back(carry);
     }
+    if(sumaMantisas){
+        j = resultadoAux.size() - 1;    //No le quitamos el primer 1
+    }else{
+        j = resultadoAux.size() - 2;    //Si
+    }
 
-    for(j = resultadoAux.size() - 2; j >= 0; j--){       //Para darle la vuelta al resultado
+    for(j; j >= 0; j--){       //Para darle la vuelta al resultado
         resultado.push_back(resultadoAux.at(j));
     }
     return resultado;

@@ -39,6 +39,8 @@ void MainWindow::on_runButton_clicked()
 
     std::string operacion = ui->comboBoxOperacion->currentText().toStdString();
 
+
+
     if(operacion == "+"){
         result = myAlu.suma(operandoBin1, operandoBin2);
     }else if(operacion == "x"){
