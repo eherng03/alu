@@ -32,15 +32,23 @@ int alu::verExponente(floatIEEE *operando1, floatIEEE *operando2){
 floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     floatIEEE resultado;
     int exponenteResultado;
-    int iteracciones;
+    int iteraciones;
     int numeroAMultiplicar = 0;
-    std::vector<int> multiplicando = factor1->getMantisa();
-    std::vector<int> multiplicador = factor2->getMantisa();
-    std::vector<int> vectorAux1;            //La suma en cada iteraccion, del actual con los anteriores sumados
-    std::vector<int> vectorAux2;
+    std::vector<int> multiplicando;
+    std::vector<int> multiplicador;
+    std::vector<int> vectorSumaAnterior;            //La suma en cada iteraccion, del actual con los anteriores sumados
+    std::vector<int> multiplicacionParcial;
     std::vector<int> mantisaFinal;
     exponenteResultado = factor1->exponenteADecimal() + factor2->exponenteADecimal();
-    resultado.setExponente(exponenteResultado);
+
+    //Insertamos el primer uno que no tiene la mantisa en el float
+    multiplicando.push_back(1);
+    multiplicador.push_back(1);
+    std::vector<int> mantisa1 = factor1->getMantisa();
+    multiplicando.insert(multiplicando.end(), mantisa1.begin(), mantisa1.end() );
+    std::vector<int> mantisa2 = factor2->getMantisa();
+    multiplicador.insert(multiplicador.end(), mantisa2.begin(), mantisa2.end() );
+
     if(factor1->getSigno() != factor2->getSigno()){
         resultado.setSigno(1);
     }else{
@@ -48,38 +56,46 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
     }
 
     //Necesitamos tantas iteracciones como bits tiene el multiplicador
-    iteracciones = multiplicador.size() - 1;
+    iteraciones = multiplicador.size() - 1;
     //El primer vector auxiliar1 es la primera multiplicacion, los siguientes son la suma de los dos anteriores
-    vectorAux1.push_back(0);        //Añado un 0 para poder sumarlo mas tarde
-    numeroAMultiplicar = multiplicador.at(iteracciones);
-    for(int i = 0; i > multiplicando.size() ; i--){     //recorre los elementos del multiplicando
-        vectorAux1.push_back(multiplicando.at(i) * numeroAMultiplicar);
+    vectorSumaAnterior.push_back(0);        //Añado un 0 para poder sumarlo mas tarde
+    numeroAMultiplicar = multiplicador.at(iteraciones);
+    for(int i = 0; i < multiplicando.size() ; i++){     //recorre los elementos del multiplicando
+        vectorSumaAnterior.push_back(multiplicando.at(i) * numeroAMultiplicar);
     }
-    iteracciones--;
-    while(iteracciones >= 0){            //recorre los elementos del multiplicador(el de abajo)
-
-        numeroAMultiplicar = multiplicador.at(iteracciones);
-        for(int i = 0; i > multiplicando.size() ; i--){     //recorre los elementos del multiplicando
-            vectorAux2.push_back(multiplicando.at(i) * numeroAMultiplicar);
+    iteraciones--;
+    while(iteraciones >= 0){            //recorre los elementos del multiplicador(el de abajo)
+        multiplicacionParcial.clear();
+        numeroAMultiplicar = multiplicador.at(iteraciones);
+        for(int i = 0; i < multiplicando.size() ; i++){     //recorre los elementos del multiplicando
+            multiplicacionParcial.push_back(multiplicando.at(i) * numeroAMultiplicar);
+        }
+        for(int x = 0; x <= vectorSumaAnterior.size() - multiplicacionParcial.size(); x++){
+            multiplicacionParcial.push_back(0);
         }
 
-        vectorAux2.push_back(0);
-
-        std::vector<int> jamon = sumar(vectorAux1, vectorAux2, true);       //Cambiarle el nobre jeje
-        if(jamon.size() - 1 == vectorAux2.size()){
-            vectorAux1.push_back(0);
+        std::vector<int> suma = sumar(vectorSumaAnterior, multiplicacionParcial, true);
+        vectorSumaAnterior.clear();
+        if(suma.size() == multiplicacionParcial.size()){
+            vectorSumaAnterior.push_back(0);
         }
-        vectorAux1.insert(vectorAux1.end(), jamon.begin(), jamon.end() );
+        vectorSumaAnterior.insert(vectorSumaAnterior.end(), suma.begin(), suma.end() );
 
-        iteracciones--;
+        iteraciones--;
     }
 
-    //VectorAux1 va a ser un vector de 46 elementos, seleccionamos solo los 23 primeros
-    for(int i = 0; i < 23; i++){
-        mantisaFinal.push_back(vectorAux1.at(i));
+    if(vectorSumaAnterior.at(1) == 1){
+        exponenteResultado++;
     }
+
+    //VectorAux1 va a ser un vector de 46 elementos, seleccionamos solo los 23 primeros, quitandole el 1
+    for(int i = 1; i <= 23; i++){
+        mantisaFinal.push_back(vectorSumaAnterior.at(i));
+    }
+
 
     resultado.setMantisa(mantisaFinal);
+    resultado.setExponente(exponenteResultado);
     resultado.procesarNumero();
     return resultado;
 
