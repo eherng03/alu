@@ -70,7 +70,8 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
         for(int i = 0; i < multiplicando.size() ; i++){     //recorre los elementos del multiplicando
             multiplicacionParcial.push_back(multiplicando.at(i) * numeroAMultiplicar);
         }
-        for(int x = 0; x <= vectorSumaAnterior.size() - multiplicacionParcial.size(); x++){
+        int sizeMult = multiplicacionParcial.size();
+        for(int x = 0; x < vectorSumaAnterior.size() - sizeMult; x++){
             multiplicacionParcial.push_back(0);
         }
 
