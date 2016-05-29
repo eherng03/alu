@@ -85,12 +85,16 @@ floatIEEE alu::producto(floatIEEE* factor1, floatIEEE* factor2){
         iteraciones--;
     }
 
-    if(vectorSumaAnterior.at(1) == 1){
+    int i = 2;
+    int posicionFinal = 24;
+    if(vectorSumaAnterior.at(0) == 1){
         exponenteResultado++;
+        i = 1;
+        posicionFinal = 23;
     }
 
     //VectorAux1 va a ser un vector de 46 elementos, seleccionamos solo los 23 primeros, quitandole el 1
-    for(int i = 1; i <= 23; i++){
+    for(i; i <= posicionFinal; i++){
         mantisaFinal.push_back(vectorSumaAnterior.at(i));
     }
 
